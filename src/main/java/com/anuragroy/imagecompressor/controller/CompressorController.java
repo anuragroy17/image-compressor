@@ -20,11 +20,6 @@ import java.nio.file.Files;
 @RequestMapping("/api")
 public class CompressorController {
 
-    @PostConstruct
-    public void init() {
-        Tinify.setKey(System.getenv("TINIFY_API_KEY"));
-    }
-
     @PostMapping("/uploadImage")
     public ResponseEntity<ByteArrayResource> uploadFile(
             @RequestParam("file") MultipartFile multipartFile)
@@ -51,8 +46,12 @@ public class CompressorController {
 
     @GetMapping("/compression-count")
     public ResponseEntity<String> getCompressionCount() {
-        int compressionsThisMonth = Tinify.compressionCount();
-        return new ResponseEntity<>(String.valueOf(compressionsThisMonth), HttpStatus.OK);
+        try {
+            final int compressionsThisMonth = Tinify.compressionCount();
+            return new ResponseEntity<>(String.valueOf(compressionsThisMonth), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }
