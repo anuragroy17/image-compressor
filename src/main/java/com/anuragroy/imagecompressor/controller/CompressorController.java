@@ -2,7 +2,6 @@ package com.anuragroy.imagecompressor.controller;
 
 import com.tinify.*;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,10 +10,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.lang.Exception;
-import java.nio.file.Files;
 
 @RestController
 @RequestMapping("/api")
