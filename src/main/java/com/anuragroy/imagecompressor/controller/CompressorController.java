@@ -1,0 +1,58 @@
+package com.anuragroy.imagecompressor.controller;
+
+import com.tinify.*;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.lang.Exception;
+import java.nio.file.Files;
+
+@RestController
+@RequestMapping("/api")
+public class CompressorController {
+
+    @PostConstruct
+    public void init() {
+        Tinify.setKey(System.getenv("TINIFY_API_KEY"));
+    }
+
+    @PostMapping("/uploadImage")
+    public ResponseEntity<ByteArrayResource> uploadFile(
+            @RequestParam("file") MultipartFile multipartFile)
+            throws IOException {
+        try {
+            String imageName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+
+            byte[] sourceData = multipartFile.getBytes();
+            byte[] resultData = Tinify.fromBuffer(sourceData).toBuffer();
+            final ByteArrayResource compressedImage = new ByteArrayResource(resultData);
+
+            return ResponseEntity.ok()
+                    .contentLength(compressedImage.contentLength())
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                    .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"", imageName))
+                    .body(compressedImage);
+        } catch (final IOException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (AccountException | ClientException | ServerException | ConnectionException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/compression-count")
+    public ResponseEntity<String> getCompressionCount() {
+        int compressionsThisMonth = Tinify.compressionCount();
+        return new ResponseEntity<>(String.valueOf(compressionsThisMonth), HttpStatus.OK);
+    }
+
+}
