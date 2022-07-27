@@ -16,6 +16,7 @@ import java.lang.Exception;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin("*")
 @Log4j2
 public class CompressorController {
 
