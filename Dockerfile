@@ -11,4 +11,5 @@ RUN mvn clean package -DskipTests
 FROM openjdk:17-jdk-slim-buster
 MAINTAINER anuragroy.com
 COPY --from=build /target/image-compressor-1.0.0.jar image-compressor.jar
+EXPOSE 8091
 ENTRYPOINT ["java","-jar","/image-compressor.jar"]
