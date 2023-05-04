@@ -1,5 +1,6 @@
 package com.anuragroy.imagecompressor.controller;
 
+import com.anuragroy.imagecompressor.dto.CountDto;
 import com.tinify.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.ByteArrayResource;
@@ -47,11 +48,11 @@ public class CompressorController {
     }
 
     @GetMapping("/compression-count")
-    public ResponseEntity<String> getCompressionCount() {
+    public ResponseEntity<?> getCompressionCount() {
         try {
             final int compressionsThisMonth = Tinify.compressionCount();
             log.info("Total Compressions: " +  compressionsThisMonth);
-            return new ResponseEntity<>(String.valueOf(compressionsThisMonth), HttpStatus.OK);
+            return new ResponseEntity<>(new CountDto(compressionsThisMonth), HttpStatus.OK);
         } catch (Exception e) {
             log.error("error occurred while retrieving total compressions: " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
